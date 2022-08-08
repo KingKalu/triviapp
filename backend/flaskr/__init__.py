@@ -43,26 +43,26 @@ def create_app(test_config=None):
     Create an endingpoint to handle GET requests
     for all available categories.
     """
-    
+
 
     @app.route('/quizzes', methods=['POST'])
     def play_quiz():
 
         try:
 
-            body = request.get_json()
+            body = request.get_json() #recieving the body of the request
 
-            category = body.get('quiz_category')
-            previous_questions = body.get('previous_questions')
-            if len(category) == 0:
+            quiz_category = body.get('quiz_category')
+            previous_questions = body.get('previous_questions') 
+            if len(quiz_category) == 0:
                 abort(422)
-            if category['type'] and category['type'] == 'click':
+            if quiz_category['type']: #checking if the category.type has the value click
                   available_questions = Question.query.filter(
-                    Question.id.notin_((previous_questions))).all()
+                    Question.id.notin_((previous_questions))).all() #filtering excluding previous questions
             else:
-              available_questions = Question.query.filter_by(category=category['id']).filter(Question.id.notin_((previous_questions))).all()
+                available_questions = Question.query.filter_by(category=quiz_category['id']).filter(Question.id.notin_((previous_questions))).all()
 
-            new_question = available_questions[random.randrange(0, len(available_questions))].format() if len(available_questions) > 0 else None
+                new_question = available_questions[random.randrange(0, len(available_questions))].format() if len(available_questions) > 0 else None
 
             return jsonify({
                 'success': True,
@@ -157,9 +157,9 @@ def create_app(test_config=None):
         if len(current_questions) == 0: abort(404)
 
         return jsonify({
-            'success': True,
-            'questions': current_questions,
-            'all_questions': len(choose),
+            'success':True,
+            'questions':current_questions,
+            'all_questions':len(choose),
             'categories':categoriesObject,
             'current_category': None
         })
