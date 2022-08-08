@@ -56,7 +56,7 @@ def create_app(test_config=None):
             previous_questions = body.get('previous_questions') 
             if len(quiz_category) == 0:
                 abort(422)
-            if quiz_category['type']: #checking if the category.type has the value click
+            if quiz_category['type']:
                   available_questions = Question.query.filter(
                     Question.id.notin_((previous_questions))).all() #filtering excluding previous questions
             else:
