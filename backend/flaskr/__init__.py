@@ -61,11 +61,11 @@ def create_app(test_config=None):
             else:
                 available_questions = Question.query.filter_by(category=quiz_category['id']).filter(Question.id.notin_((previous_questions))).all()
 
-            new_question = available_questions[random.randrange(0, len(available_questions))].format() if len(available_questions) > 0 else None
+            SetQuestion = available_questions[random.randrange(0, len(available_questions))].format() if len(available_questions) > 0 else None
 
             return jsonify({
                 'success': True,
-                'question': new_question
+                'question': SetQuestion
             })
         except:
             abort(422)
