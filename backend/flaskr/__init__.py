@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 import os
+from sre_constants import AT_BOUNDARY
 from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
@@ -54,11 +55,9 @@ def create_app(test_config=None):
 
             quiz_category = body.get('quiz_category')
             previous_questions = body.get('previous_questions') 
-            if len(quiz_category) == 0:
+            if quiz_category is None:
                 abort(422)
-            if quiz_category['type']:
-                  available_questions = Question.query.filter(
-                    Question.id.notin_((previous_questions))).all() #filtering excluding previous questions
+           
             else:
                 available_questions = Question.query.filter_by(category=quiz_category['id']).filter(Question.id.notin_((previous_questions))).all()
 
@@ -96,10 +95,10 @@ def create_app(test_config=None):
             else: abort(422)
 
     
-        elif search_term:
+        else:
+            if search_term is None: abort(400)
             search_results = Question.query.filter(
             Question.question.ilike(f'%{search_term}%')).all()
-            if len(search_results) == 0: abort(404)
 
             return jsonify(
                 {

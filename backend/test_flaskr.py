@@ -132,16 +132,14 @@ class TriviaTestCase(unittest.TestCase):
         self.assertIsNotNone(data['questions'])
         self.assertIsNotNone(data['all_questions'])
 
-    def test_404_search_question(self):
-        new_search = {
-            'searchTerm': 'z',
-        }
+    def test_400_search_question(self):
+        new_search = None
         res = self.client().post('/questions', json=new_search)
         data = json.loads(res.data)
 
-        self.assertEqual(res.status_code, 404)
+        self.assertEqual(res.status_code, 400)
         self.assertEqual(data["success"], False)
-        self.assertEqual(data["message"], "resource not found")
+        self.assertEqual(data["message"], "bad request")
 
     def test_get_questions_per_category(self):
         res = self.client().get('/categories/1/questions')
