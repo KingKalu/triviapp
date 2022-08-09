@@ -51,17 +51,17 @@ def create_app(test_config=None):
 
         try:
 
-            body = request.get_json() #recieving the body of the request
+            JsonBody = request.get_json() #recieving the body of the request
 
-            quiz_category = body.get('quiz_category')
-            previous_questions = body.get('previous_questions') 
-            if quiz_category is None:
+            QuizCategory = JsonBody.get('quiz_category')
+            AskedQuestions = JsonBody.get('previous_questions') 
+            if QuizCategory is None:
                 abort(422)
            
             else:
-                available_questions = Question.query.filter_by(category=quiz_category['id']).filter(Question.id.notin_((previous_questions))).all()
+                ReadyQuestions = Question.query.filter_by(category=QuizCategory['id']).filter(Question.id.notin_((AskedQuestions))).all()
 
-            SetQuestion = available_questions[random.randrange(0, len(available_questions))].format() if len(available_questions) > 0 else None
+            SetQuestion = ReadyQuestions[random.randrange(0, len(ReadyQuestions))].format() if len(ReadyQuestions) > 0 else None
 
             return jsonify({
                 'success': True,
@@ -79,48 +79,48 @@ def create_app(test_config=None):
         createNew_answer = body.get('answer')
         createNew_difficulty = body.get('difficulty')
         createNew_category = body.get('category')
-        search_term = body.get('searchTerm', None)
+        SearchItem = body.get('searchTerm', None)
 
-        if search_term is None:
+        if SearchItem is None:
             if 'question' in body and 'answer' in body and 'difficulty' in body and 'category' in body:
 
-                question = Question(question=createNew_question, answer=createNew_answer,
+                PostedQuestion = Question(question=createNew_question, answer=createNew_answer,
                                     difficulty=createNew_difficulty, category=createNew_category)
-                question.insert()
+                PostedQuestion.insert()
 
                 return jsonify({
                     'success': True,
-                    'created': question.id,
+                    'created': PostedQuestion.id
                 })
             else: abort(422)
 
     
         else:
-            if search_term is None: abort(400)
-            search_results = Question.query.filter(
-            Question.question.ilike(f'%{search_term}%')).all()
+            if SearchItem is None: abort(400)
+            SearchResult = Question.query.filter(
+            Question.question.ilike(f'%{SearchItem}%')).all()
 
             return jsonify(
                 {
                     'success': True,
-                    'questions': [question.format() for question in search_results],
-                    'all_questions': len(search_results),
+                    'questions': [question.format() for question in SearchResult],
+                    'all_questions': len(SearchResult),
                     'current_category': None
                 }
                 )
    
-    @app.route('/categories/<int:category_id>/questions', methods=['GET'])
-    def retrieve_questions_by_category(category_id):
+    @app.route('/categories/<int:CategoryId>/questions', methods=['GET'])
+    def retrieve_questions_by_category(CategoryId):
 
         try:
-            if category_id is not None:
-                questions = Question.query.filter(Question.category == str(category_id)).all()
+            if CategoryId is not None:
+                questions = Question.query.filter(Question.category == str(CategoryId)).all()
                 categoryQuestions = [question.format() for question in questions]
                 return jsonify({
                     'success': True,
                     'questions':categoryQuestions,
                     'all_questions': len(questions),
-                    'current_category': category_id
+                    'current_category': CategoryId
                 })
             else: abort(404)
         except:
@@ -149,28 +149,28 @@ def create_app(test_config=None):
     @app.route('/questions')
     def retrieve_questions():
         choose = Question.query.order_by(Question.id).all()
-        current_questions = paginate_questions(request, choose)
+        CurrentQuestions = paginate_questions(request, choose)
 
         categories = Category.query.order_by(Category.type).all()
         categoriesObject = {category.id: category.type for category in categories}
-        if len(current_questions) == 0: abort(404)
+        if len(CurrentQuestions) == 0: abort(404)
 
         return jsonify({
             'success':True,
-            'questions':current_questions,
+            'questions':CurrentQuestions,
             'all_questions':len(choose),
             'categories':categoriesObject,
             'current_category': None
         })
    
-    @app.route("/questions/<question_id>", methods=['DELETE'])
-    def delete_question(question_id):
+    @app.route("/questions/<QuestionId>", methods=['DELETE'])
+    def delete_question(QuestionId):
         try:
-            question = Question.query.get(question_id)
+            question = Question.query.get(QuestionId)
             question.delete()
             return jsonify({
                 'success': True,
-                'deleted': question_id
+                'deleted': QuestionId
             })
         except:
             abort(422)
