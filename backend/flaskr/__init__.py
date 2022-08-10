@@ -47,7 +47,7 @@ def create_app(test_config=None):
 
 
     @app.route('/quizzes', methods=['POST'])
-    def play_quiz():
+    def Quiz():
 
         try:
 
@@ -72,7 +72,7 @@ def create_app(test_config=None):
    
    
     @app.route('/questions', methods=['POST'])
-    def add_question():
+    def AdddingQuestion():
         body = request.get_json()
 
         createNew_question = body.get('question')
@@ -110,7 +110,7 @@ def create_app(test_config=None):
                 )
    
     @app.route('/categories/<int:CategoryId>/questions', methods=['GET'])
-    def retrieve_questions_by_category(CategoryId):
+    def GettingCategoryQuestions(CategoryId):
 
         try:
             if CategoryId is not None:
@@ -127,7 +127,7 @@ def create_app(test_config=None):
             abort(404)
    
     @app.route('/categories')
-    def retrieve_categories():
+    def GettingCategories():
         categories = Category.query.order_by(Category.type).all()
         all_categories = {
             categories[0].id:categories[0].type,
@@ -147,7 +147,7 @@ def create_app(test_config=None):
 
    
     @app.route('/questions')
-    def retrieve_questions():
+    def GettingQuestions():
         choose = Question.query.order_by(Question.id).all()
         CurrentQuestions = paginate_questions(request, choose)
 
@@ -164,7 +164,7 @@ def create_app(test_config=None):
         })
    
     @app.route("/questions/<QuestionId>", methods=['DELETE'])
-    def delete_question(QuestionId):
+    def DeleteQuestion(QuestionId):
         try:
             question = Question.query.get(QuestionId)
             question.delete()
